@@ -31,3 +31,15 @@ where=["src"]
 
 [tool.setuptools.package-data]
 "simple_transforms" = ["*.c", "*.h"]
+
+[tool.cibuildwheel]
+# Build for cpython only
+# build = "cp310-win_amd64" # for quick local testing
+skip =  "pp*"
+# Test the wheels
+test-requires = "pytest"
+test-command = "pytest {project} -v --log-level=DEBUG"
+
+[tool.cibuildwheel.linux]
+# dependencies do not build for musl
+skip = ["pp* *musllinux*"]
