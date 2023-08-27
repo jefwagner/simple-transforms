@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61","oldest-supported-numpy","numpy-flint>=0.3.2"]
+#     "numpy-flint @ file:///home/jef/numpy-flint/dist/numpy_flint-0.3.3-cp39-cp39-linux_aarch64.whl",
+# ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simple-transforms"
+authors = [{name="Jef Wagner", email="jefwagner@gmail.com"}]
+description = "Simple 4x4 transfomation matrices as numpy arrays"
+readme = "readme.md"
+keywords = ["CAD"]
+license = {text="LGPL-3.0-or-later"}
+requires-python = ">=3.7"
+dependencies = [
+    "numpy>=1.17",
+    "numpy-flint>=0.3.2",
+    # "numpy-flint @ file:///home/jef/numpy-flint/dist/numpy_flint-0.3.3-cp39-cp39-linux_aarch64.whl",
+    "pytest"
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+license-files = ["copying*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "simple_transforms.__version__"}
+
+[tool.setuptools.packages.find]
+where=["src"]
+
+[tool.setuptools.package-data]
+"simple_transforms" = ["*.c", "*.h"]
