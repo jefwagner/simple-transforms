@@ -41,7 +41,7 @@ def from_mat(mat: npt.ArrayLike, dtype: npt.DTypeLike = flint) -> npt.NDArray:
     
     :param mat: The input matrix (any properly shaped nested sequence type).
     
-    :return: An AffineTransform object corresponding to the matrix");
+    :return: An AffineTransform object corresponding to the matrix"
     """
     mat = np.array(mat, dtype=dtype)
     if mat.shape not in ((4,4),(3,4),(3,3)):
@@ -71,7 +71,7 @@ def trans(d: npt.ArrayLike,
     :param d: A 3-length sequence [dx, dy, dz]
     :param center: Ignored
     
-    :return: An pure translation AffineTransformation.");
+    :return: An pure translation AffineTransformation.
     """
     d = np.array(d, dtype=dtype)
     if d.shape != (3,):
@@ -171,7 +171,7 @@ def refl(n: Union[str, npt.ArrayLike],
     :param center: Optional 3-length center position [cx, cy, cz] a point on the
         plane of reflection operation.
     
-    :return: A skew AffineTransformation.");
+    :return: A skew AffineTransformation.
     """
     if isinstance(n, str):
         if len(n) != 1 or n.lower()[0] not in ['x','y','z']:
