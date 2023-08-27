@@ -9,10 +9,9 @@ numpy arrays.
 ## **Other Projects**
 
 There are other more mature and more complete projects to use:
-* (transforms3d)[https://matthew-brett.github.io/transforms3d/]
+* [transforms3d](https://matthew-brett.github.io/transforms3d/)
 
-I wrote my own because I needed it to use a custom data type - a (rounded floating point
-interval)[https://github.com/jefwagner/numpy-flint].
+I wrote my own because I needed it to use a custom data type - a [rounded floating point interval](https://github.com/jefwagner/numpy-flint).
 
 ### License
 
