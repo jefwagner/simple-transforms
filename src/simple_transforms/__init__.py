@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License along with
 # simple-transforms. If pynot, see <https://www.gnu.org/licenses/>.
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 import numpy as np
 import numpy.typing as npt
@@ -245,7 +245,7 @@ def skew(n: Union[str, npt.ArrayLike],
         _relocate_center(trans, center)
     return trans
 
-def combine(lhs: npt.NDArray[flint], rhs: npt.NDArray[flint]) -> npt.NDArray[flint]:
+def combine(lhs: npt.NDArray, rhs: npt.NDArray) -> npt.NDArray:
     """Combine two affine transforms into a single transform. 
 
     This is simply the matrix multiplication of the two transforms, and so the
@@ -260,7 +260,7 @@ def combine(lhs: npt.NDArray[flint], rhs: npt.NDArray[flint]) -> npt.NDArray[fli
     """
     return np.dot(lhs, rhs)
 
-def transform_reduce(transforms: list[npt.NDArray[flint]]) -> npt.NDArray[flint]:
+def transform_reduce(transforms: List[npt.NDArray]) -> npt.NDArray:
     r"""Reduce a sequence of affine transforms into a single affine transform.
 
     This is the same as a repeated matrix multiplication, and so order of the
@@ -279,7 +279,7 @@ def transform_reduce(transforms: list[npt.NDArray[flint]]) -> npt.NDArray[flint]
         np.dot(tr, out, out=out)
     return out
 
-def apply(transform: npt.NDArray[flint], v_in: npt.ArrayLike) -> npt.NDArray[flint]:
+def apply(transform: npt.NDArray, v_in: npt.ArrayLike) -> npt.NDArray:
     """Apply a transform to a single vertex or array of vertices.
 
     The vertex can either be a 3-length coordinates [x,y,z] or 4-length 
