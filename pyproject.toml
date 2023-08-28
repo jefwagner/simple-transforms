@@ -1,7 +1,5 @@
 [build-system]
-requires = ["setuptools>=61","oldest-supported-numpy","numpy-flint>=0.3.2"]
-#     "numpy-flint @ file:///home/jef/numpy-flint/dist/numpy_flint-0.3.3-cp39-cp39-linux_aarch64.whl",
-# ]
+requires = ["setuptools>=61","oldest-supported-numpy","numpy-flint>=0.3.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -14,11 +12,14 @@ license = {text="LGPL-3.0-or-later"}
 requires-python = ">=3.7"
 dependencies = [
     "numpy>=1.17",
-    "numpy-flint>=0.3.2",
-    # "numpy-flint @ file:///home/jef/numpy-flint/dist/numpy_flint-0.3.3-cp39-cp39-linux_aarch64.whl",
+    "numpy-flint>=0.3.3",
     "pytest"
 ]
 dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://jefwagner.github.io/simple-transforms"
+"Bug Tracker" = "https://github.com/jefwagner/simple-transforms/issues"
 
 [tool.setuptools]
 license-files = ["copying*"]
