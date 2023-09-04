@@ -180,14 +180,26 @@ static struct PyModuleDef moduledef = {
     .m_methods = AffineMethods,
 };
 
+PyUFuncGenericFunction rescale_loopfuncs[] = {
+    &pyaffine_rescale_double,
+    &pyaffine_rescale_float};
+static const char rescale_builtin_types[] = {
+    NPY_DOUBLE, NPY_DOUBLE, 
+    NPY_FLOAT, NPY_FLOAT};
+
+PyUFuncGenericFunction apply_loopfuncs[] = {
+    &pyaffine_apply_vert_double,
+    &pyaffine_apply_vert_float};
+static const char apply_builtin_types[] = {
+    NPY_DOUBLE, NPY_DOUBLE, NPY_DOUBLE, 
+    NPY_FLOAT, NPY_FLOAT, NPY_FLOAT};
+
 // The module initialization function
 PyMODINIT_FUNC PyInit__c_trans(void) {
     PyObject* m;
     PyObject* d;
     PyObject* ufunc;
-    PyObject* apply_vert_ufunc;
-    PyUFuncGenericFunction loopfuncs[] = {NULL, NULL};
-    int ufunc_types[6] = {0};
+    PyUFuncGenericFunction loopfuncs[2] = {NULL, NULL};
     m = PyModule_Create(&moduledef);
     if (m==NULL) {
         PyErr_Print();
@@ -215,41 +227,24 @@ PyMODINIT_FUNC PyInit__c_trans(void) {
         return NULL;
     }
     // Register the rescale ufuncs
-    loopfuncs[0] = &pyaffine_rescale_double;
-    loopfuncs[1] = &pyaffine_rescale_float;
-    ufunc_types[0] = NPY_DOUBLE;
-    ufunc_types[1] = NPY_DOUBLE;
-    ufunc_types[2] = NPY_FLOAT;
-    ufunc_types[3] = NPY_FLOAT;
     ufunc = PyUFunc_FromFuncAndDataAndSignature(
-        loopfuncs, NULL, ufunc_types, 2, 1, 1, PyUFunc_None,
+        rescale_loopfuncs, NULL, rescale_builtin_types, 2, 1, 1, PyUFunc_None,
         "rescale", rescale_docstring, 0, "(4)->(4)");
-    ufunc_types[0] = NPY_FLINT;
-    ufunc_types[1] = NPY_FLINT;
+    int rescale_custom_types[] = {NPY_FLINT, NPY_FLINT};
     PyUFunc_RegisterLoopForType(
         (PyUFuncObject*) ufunc, NPY_FLINT,
-        &pyaffine_rescale_flint, ufunc_types, NULL);
+        &pyaffine_rescale_flint, rescale_custom_types, NULL);
     d = PyModule_GetDict(m);
     PyDict_SetItemString(d, "rescale", ufunc);
     Py_DECREF(ufunc);
     // Register the apply_vert ufuncs  
-    loopfuncs[0] = &pyaffine_apply_vert_double;
-    loopfuncs[1] = &pyaffine_apply_vert_float;
-    ufunc_types[0] = NPY_DOUBLE;
-    ufunc_types[1] = NPY_DOUBLE;
-    ufunc_types[2] = NPY_DOUBLE;
-    ufunc_types[3] = NPY_FLOAT;
-    ufunc_types[4] = NPY_FLOAT;
-    ufunc_types[5] = NPY_FLOAT;
     ufunc = PyUFunc_FromFuncAndDataAndSignature(
-        loopfuncs, NULL, ufunc_types, 2, 2, 1, PyUFunc_None,
+        apply_loopfuncs, NULL, apply_builtin_types, 2, 2, 1, PyUFunc_None,
         "apply_vert", apply_vert_docstring, 0, "(4,4),(3)->(3)");
-    ufunc_types[0] = NPY_FLINT;
-    ufunc_types[1] = NPY_FLINT;
-    ufunc_types[2] = NPY_FLINT;
+    int apply_custom_types[] = {NPY_FLINT, NPY_FLINT, NPY_FLINT};
     PyUFunc_RegisterLoopForType(
         (PyUFuncObject*) ufunc, NPY_FLINT,
-        &pyaffine_apply_vert_flint, ufunc_types, NULL);
+        &pyaffine_apply_vert_flint, apply_custom_types, NULL);
     d = PyModule_GetDict(m);
     PyDict_SetItemString(d, "apply_vert", ufunc);
     Py_DECREF(ufunc);
