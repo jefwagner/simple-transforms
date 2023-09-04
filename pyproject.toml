@@ -18,7 +18,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-"Homepage" = "https://jefwagner.github.io/simple-transforms"
+"Homepage" = "https://jefwagner.github.io/transforms"
 "Bug Tracker" = "https://github.com/jefwagner/simple-transforms/issues"
 
 [tool.setuptools]

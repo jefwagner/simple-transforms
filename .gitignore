@@ -5,8 +5,12 @@
 
 ## Package build stuff
 dist/
+wheelhouse/
 **/*.egg-info
 **/*.cpython*
+*.zip
+*.tar.gz
+*.tar.bz2
 
 # Allow for scratch jupyter notebooks
 **/*.ipynb
