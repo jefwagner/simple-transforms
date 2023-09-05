@@ -19,19 +19,23 @@ from typing import Union, Optional, List
 
 import numpy as np
 import numpy.typing as npt
-from flint import flint
+try:
+    from flint import flint
+    DEFAULT_DTYPE = flint
+except ModuleNotFoundError:
+    DEFAULT_DTYPE = np.float64
 
 from ._c_trans import rescale, apply_vert
 
 NumLike = Union[int, float, flint]
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
-def eye(dtype: npt.DTypeLike = flint) -> npt.NDArray:
+def eye(dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create an identify affine transform"""
     return np.eye(4, dtype=dtype)
 
-def from_mat(mat: npt.ArrayLike, dtype: npt.DTypeLike = flint) -> npt.NDArray:
+def from_mat(mat: npt.ArrayLike, dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create a new generic affine transform from a 4x4, 3x4 or 3x3 matrix
     
     * A 3x3 matrix will only specify the linear transformation.
@@ -65,7 +69,7 @@ def _relocate_center(trans: npt.NDArray, center: npt.ArrayLike):
 
 def trans(d: npt.ArrayLike, 
           center: Optional[npt.NDArray] = None, 
-          dtype: npt.DTypeLike = flint) -> npt.NDArray:
+          dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create a new pure translation transformation.
     
     :param d: A 3-length sequence [dx, dy, dz]
@@ -83,7 +87,7 @@ def trans(d: npt.ArrayLike,
 
 def scale(s: Union[NumLike, npt.ArrayLike], 
           center: Optional[npt.NDArray] = None, 
-          dtype: npt.DTypeLike = flint) -> npt.NDArray:
+          dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create a new pure scaling transformation.
     
     :param s: A scalar or 3-length sequence [sx, sy, sz] for scaling along each n
@@ -107,7 +111,7 @@ def scale(s: Union[NumLike, npt.ArrayLike],
 def rot(axis: Union[str, npt.ArrayLike], 
         angle: NumLike,
         center: Optional[npt.ArrayLike] = None,
-        dtype: npt.DTypeLike = flint) -> npt.NDArray:
+        dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create a new pure rotation transformation.
     
     :param axis: The character 'x','y','z' or a three length vector [ax, ay, az]
@@ -163,7 +167,7 @@ def rot(axis: Union[str, npt.ArrayLike],
 
 def refl(n: Union[str, npt.ArrayLike],
          center: Optional[npt.ArrayLike] = None,
-         dtype: npt.DTypeLike = flint) -> npt.NDArray:
+         dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create a new pure reflection transformation.
     
     :param normal: The character 'x','y','z' or a 3 length [ux, uy, uz] vector for
@@ -203,7 +207,7 @@ def refl(n: Union[str, npt.ArrayLike],
 def skew(n: Union[str, npt.ArrayLike],
          s: npt.ArrayLike,
          center: Optional[npt.ArrayLike] = None,
-         dtype: npt.DTypeLike = flint) -> npt.NDArray:
+         dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create a new pure skew transformation.
     
     :param n: The character 'x','y','z' or a 3 length [nx, ny, nz] normal

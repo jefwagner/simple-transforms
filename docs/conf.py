@@ -13,6 +13,7 @@ project = 'simple_transforms'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
+    'sphinx-prompt',
 ]
 
 todo_include_todos = True
@@ -25,7 +26,7 @@ source_suffix = {
 master_doc = 'index'
 language = 'en'
 
-html_theme = 'sphinx_book_theme'
+html_theme = 'furo'
 
 add_module_names = False
 autodoc_typehints = 'none'

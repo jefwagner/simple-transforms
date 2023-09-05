@@ -12,13 +12,16 @@ license = {text="LGPL-3.0-or-later"}
 requires-python = ">=3.7"
 dependencies = [
     "numpy>=1.17",
-    "numpy-flint>=0.3.3",
-    "pytest"
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+flint = [
+    "numpy-flint>=0.3.3",
+]
+
 [project.urls]
-"Homepage" = "https://jefwagner.github.io/simple-transforms"
+"Homepage" = "https://jefwagner.github.io/transforms"
 "Bug Tracker" = "https://github.com/jefwagner/simple-transforms/issues"
 
 [tool.setuptools]
@@ -38,7 +41,7 @@ where=["src"]
 # build = "cp310-win_amd64" # for quick local testing
 skip =  "pp*"
 # Test the wheels
-test-requires = "pytest"
+test-requires = ["pytest", "numpy-flint>=0.3.3"]
 test-command = "pytest {project} -v --log-level=DEBUG"
 
 [tool.cibuildwheel.linux]
