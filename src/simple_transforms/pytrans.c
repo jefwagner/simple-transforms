@@ -199,7 +199,6 @@ PyMODINIT_FUNC PyInit__c_trans(void) {
     PyObject* m;
     PyObject* d;
     PyObject* ufunc;
-    PyUFuncGenericFunction loopfuncs[2] = {NULL, NULL};
     m = PyModule_Create(&moduledef);
     if (m==NULL) {
         PyErr_Print();
