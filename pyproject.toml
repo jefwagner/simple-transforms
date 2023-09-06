@@ -9,9 +9,9 @@ description = "Simple 4x4 transfomation matrices as numpy arrays"
 readme = "readme.md"
 keywords = ["CAD"]
 license = {text="LGPL-3.0-or-later"}
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
-    "numpy>=1.14.5",
+    "numpy>=1.17.3",
 ]
 dynamic = ["version"]
 
