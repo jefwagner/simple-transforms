@@ -25,7 +25,7 @@ setup_args = dict(
     ext_modules = [
         Extension(
             name='simple_transforms._c_trans',
-            sources=['src/simple_transforms/pytrans.c'],
+            sources=['src/simple_transforms/trans.c'],
             depends=[],
             include_dirs=[
                 np.get_include(),

@@ -53,11 +53,12 @@ Apply an affine transform to an array of 3-length vertices");
 /**
  * Type generic transformation application function macro
  * 
+ * :param DIM: The dimension of the coordinates points (2 or 3)
  * :param TYPE: The c type (float, double, flint)
  * :param COMP: The comparison operations
  */
-#define PYAFFINE_APPLY_VERT(TYPE, COMP)\
-static void pyaffine_apply_vert_##TYPE(char** args,\
+#define PYAFFINE_APPLY_VERT(DIM, TYPE, COMP)\
+static void pyaffine_apply_vert##DIM##_##TYPE(char** args,\
                                 npy_intp const* dims,\
                                 npy_intp const* strides,\
                                 void* data) {\
@@ -80,34 +81,34 @@ static void pyaffine_apply_vert_##TYPE(char** args,\
     TYPE v_in_f, w;\
     for (n=0; n<N; n++) {\
         /* Matrix mult -> v_out = af(:3,:3).v_in */\
-        for (i=0; i<3; i++) {\
+        for (i=0; i<DIM; i++) {\
             af_i = af_base + i*d_af_i;\
             v_out = v_out_base + i*d_v_out_i;\
             *((TYPE*) v_out) = int_to_##TYPE(0);\
-            for (j=0; j<3; j++) {\
+            for (j=0; j<DIM; j++) {\
                 af = af_i + j*d_af_j;\
                 v_in = v_in_base + j*d_v_in_j;\
                 v_in_f = *((TYPE*) v_in);\
                 TYPE##_inplace_add((TYPE*) v_out, TYPE##_multiply(*((TYPE*) af), v_in_f));\
             }\
-            /* Add trans -> v_out = v_out + af(:3,4) */\
-            af = af_i + 3*d_af_j;\
+            /* Add trans -> v_out = v_out + af(:DIM,4) */\
+            af = af_i + DIM*d_af_j;\
             TYPE##_inplace_add((TYPE*) v_out, *((TYPE*) af));\
         }\
         /* calc homogenous 'w' term */\
-        af_i = af_base + 3*d_af_i;\
+        af_i = af_base + DIM*d_af_i;\
         w = int_to_##TYPE(0);\
-        for (j=0; j<3; j++) {\
+        for (j=0; j<DIM; j++) {\
             af = af_i + j*d_af_j;\
             v_in = v_in_base + j*d_v_in_j;\
             v_in_f = *((TYPE*) v_in);\
             TYPE##_inplace_add(&w, TYPE##_multiply(*((TYPE*) af), v_in_f));\
         }\
-        af = af_i + 3*d_af_j;\
+        af = af_i + DIM*d_af_j;\
         TYPE##_inplace_add(&w, *((TYPE*) af));\
         /* rescale */\
         if (COMP) {\
-            for (i=0; i<3; i++) {\
+            for (i=0; i<DIM; i++) {\
                 v_out = v_out_base + i*d_v_out_i;\
                 TYPE##_inplace_divide((TYPE*) v_out, w);\
             }\
@@ -118,22 +119,26 @@ static void pyaffine_apply_vert_##TYPE(char** args,\
     }\
 }
 
-PYAFFINE_APPLY_VERT(float, fabs(w-((float) 1.0)) > (float) ALMOST_EQUAL_EPS)
-PYAFFINE_APPLY_VERT(double, abs(w - 1.0) > ALMOST_EQUAL_EPS)
-PYAFFINE_APPLY_VERT(flint, !flint_eq(w, int_to_flint(1)))
+PYAFFINE_APPLY_VERT(3, float, fabs(w-((float) 1.0)) > (float) ALMOST_EQUAL_EPS)
+PYAFFINE_APPLY_VERT(3, double, abs(w - 1.0) > ALMOST_EQUAL_EPS)
+PYAFFINE_APPLY_VERT(3, flint, !flint_eq(w, int_to_flint(1)))
 
+PYAFFINE_APPLY_VERT(2, float, fabs(w-((float) 1.0)) > (float) ALMOST_EQUAL_EPS)
+PYAFFINE_APPLY_VERT(2, double, abs(w - 1.0) > ALMOST_EQUAL_EPS)
+PYAFFINE_APPLY_VERT(2, flint, !flint_eq(w, int_to_flint(1)))
 
 PyDoc_STRVAR(rescale_docstring, "\
 Rescale an array of 4-length homogenous coordinates x,y,z,w -> x/w,y/w,z/w,1");
 
 /**
  * Type generic rescale function macro
- * 
+ *
+ * :param DIM: The dimension of the coordinates points (2 or 3)
  * :param TYPE: The c type (float, double, flint)
  * :param COMP: The comparison operations
  */
-#define PYAFFINE_RESCALE(TYPE, COMP)\
-static void pyaffine_rescale_##TYPE(char** args,\
+#define PYAFFINE_RESCALE(DIM, TYPE, COMP)\
+static void pyaffine_rescale_##DIM##_##TYPE(char** args,\
                                   npy_intp const* dims,\
                                   npy_intp const* strides,\
                                   void* data) {\
@@ -149,14 +154,14 @@ static void pyaffine_rescale_##TYPE(char** args,\
     npy_intp d_h_out_i = strides[3];\
     TYPE w;\
     for (n=0; n<N; n++) {\
-        w = *((TYPE*) (h_in_base + 3*d_h_in_i));\
+        w = *((TYPE*) (h_in_base + DIM*d_h_in_i));\
         if (COMP) {\
-            for( i=0; i<3; i++) {\
+            for( i=0; i<DIM; i++) {\
                 h_in = h_in_base + i*d_h_in_i;\
                 h_out = h_out_base + i*d_h_out_i;\
                 *((TYPE*) h_out) = TYPE##_divide(*((TYPE*) h_in), w);\
             }\
-            h_out = h_out_base + 3*d_h_out_i;\
+            h_out = h_out_base + DIM*d_h_out_i;\
             *((TYPE*) h_out) = int_to_##TYPE(1);\
         }\
         h_in_base += d_h_in_n;\
@@ -164,9 +169,13 @@ static void pyaffine_rescale_##TYPE(char** args,\
     }\
 }
 
-PYAFFINE_RESCALE(float, fabs(w-((float) 1.0)) > (float) ALMOST_EQUAL_EPS)
-PYAFFINE_RESCALE(double, abs(w - 1.0) > ALMOST_EQUAL_EPS)
-PYAFFINE_RESCALE(flint, !flint_eq(w, int_to_flint(1)))
+PYAFFINE_RESCALE(3, float, fabs(w-((float) 1.0)) > (float) ALMOST_EQUAL_EPS)
+PYAFFINE_RESCALE(3, double, abs(w - 1.0) > ALMOST_EQUAL_EPS)
+PYAFFINE_RESCALE(3, flint, !flint_eq(w, int_to_flint(1)))
+
+PYAFFINE_RESCALE(2, float, fabs(w-((float) 1.0)) > (float) ALMOST_EQUAL_EPS)
+PYAFFINE_RESCALE(2, double, abs(w - 1.0) > ALMOST_EQUAL_EPS)
+PYAFFINE_RESCALE(2, flint, !flint_eq(w, int_to_flint(1)))
 
 static PyMethodDef AffineMethods[] = {
     {NULL, NULL, 0, NULL}
@@ -180,16 +189,22 @@ static struct PyModuleDef moduledef = {
     .m_methods = AffineMethods,
 };
 
-PyUFuncGenericFunction rescale_loopfuncs[] = {
-    &pyaffine_rescale_double,
-    &pyaffine_rescale_float};
+PyUFuncGenericFunction rescale_3_loopfuncs[] = {
+    &pyaffine_rescale_3_double,
+    &pyaffine_rescale_3_float};
+PyUFuncGenericFunction rescale_2_loopfuncs[] = {
+    &pyaffine_rescale_2_double,
+    &pyaffine_rescale_2_float};
 static const char rescale_builtin_types[] = {
     NPY_DOUBLE, NPY_DOUBLE, 
     NPY_FLOAT, NPY_FLOAT};
 
-PyUFuncGenericFunction apply_loopfuncs[] = {
-    &pyaffine_apply_vert_double,
-    &pyaffine_apply_vert_float};
+PyUFuncGenericFunction apply_3_loopfuncs[] = {
+    &pyaffine_apply_vert3_double,
+    &pyaffine_apply_vert3_float};
+PyUFuncGenericFunction apply_2_loopfuncs[] = {
+    &pyaffine_apply_vert2_double,
+    &pyaffine_apply_vert2_float};
 static const char apply_builtin_types[] = {
     NPY_DOUBLE, NPY_DOUBLE, NPY_DOUBLE, 
     NPY_FLOAT, NPY_FLOAT, NPY_FLOAT};
@@ -225,27 +240,42 @@ PyMODINIT_FUNC PyInit__c_trans(void) {
         PyErr_SetString(PyExc_SystemError, "Could not load NumPy ufunc c API.");
         return NULL;
     }
+    d = PyModule_GetDict(m);
     // Register the rescale ufuncs
     ufunc = PyUFunc_FromFuncAndDataAndSignature(
-        rescale_loopfuncs, NULL, rescale_builtin_types, 2, 1, 1, PyUFunc_None,
-        "rescale", rescale_docstring, 0, "(4)->(4)");
+        rescale_3_loopfuncs, NULL, rescale_builtin_types, 2, 1, 1, PyUFunc_None,
+        "rescale3", rescale_docstring, 0, "(4)->(4)");
     int rescale_custom_types[] = {NPY_FLINT, NPY_FLINT};
     PyUFunc_RegisterLoopForType(
         (PyUFuncObject*) ufunc, NPY_FLINT,
-        &pyaffine_rescale_flint, rescale_custom_types, NULL);
-    d = PyModule_GetDict(m);
-    PyDict_SetItemString(d, "rescale", ufunc);
+        &pyaffine_rescale_3_flint, rescale_custom_types, NULL);
+    PyDict_SetItemString(d, "rescale3", ufunc);
+    Py_DECREF(ufunc);
+    ufunc = PyUFunc_FromFuncAndDataAndSignature(
+        rescale_2_loopfuncs, NULL, rescale_builtin_types, 2, 1, 1, PyUFunc_None,
+        "rescale2", rescale_docstring, 0, "(3)->(3)");
+    PyUFunc_RegisterLoopForType(
+        (PyUFuncObject*) ufunc, NPY_FLINT,
+        &pyaffine_rescale_2_flint, rescale_custom_types, NULL);
+    PyDict_SetItemString(d, "rescale2", ufunc);
     Py_DECREF(ufunc);
     // Register the apply_vert ufuncs  
     ufunc = PyUFunc_FromFuncAndDataAndSignature(
-        apply_loopfuncs, NULL, apply_builtin_types, 2, 2, 1, PyUFunc_None,
-        "apply_vert", apply_vert_docstring, 0, "(4,4),(3)->(3)");
+        apply_3_loopfuncs, NULL, apply_builtin_types, 2, 2, 1, PyUFunc_None,
+        "apply_vert3", apply_vert_docstring, 0, "(4,4),(3)->(3)");
     int apply_custom_types[] = {NPY_FLINT, NPY_FLINT, NPY_FLINT};
     PyUFunc_RegisterLoopForType(
         (PyUFuncObject*) ufunc, NPY_FLINT,
-        &pyaffine_apply_vert_flint, apply_custom_types, NULL);
-    d = PyModule_GetDict(m);
-    PyDict_SetItemString(d, "apply_vert", ufunc);
+        &pyaffine_apply_vert3_flint, apply_custom_types, NULL);
+    PyDict_SetItemString(d, "apply_vert3", ufunc);
+    Py_DECREF(ufunc);
+    ufunc = PyUFunc_FromFuncAndDataAndSignature(
+        apply_2_loopfuncs, NULL, apply_builtin_types, 2, 2, 1, PyUFunc_None,
+        "apply_vert2", apply_vert_docstring, 0, "(3,3),(2)->(2)");
+    PyUFunc_RegisterLoopForType(
+        (PyUFuncObject*) ufunc, NPY_FLINT,
+        &pyaffine_apply_vert2_flint, apply_custom_types, NULL);
+    PyDict_SetItemString(d, "apply_vert2", ufunc);
     Py_DECREF(ufunc);
 
     return m;
