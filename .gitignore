@@ -11,12 +11,15 @@ wheelhouse/
 *.zip
 *.tar.gz
 *.tar.bz2
+animations/media/
 
 # Allow for scratch jupyter notebooks
 **/*.ipynb
+**/.ipynb_checkpoints
 # # Except the persistent ones for demo and development
 # !test.ipynb
 # !demo.ipynb
+!animations/dim3.ipynb
 
 # Editor specific stuff
 .vscode
