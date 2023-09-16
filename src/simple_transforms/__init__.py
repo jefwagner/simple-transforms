@@ -16,4 +16,4 @@
 # You should have received a copy of the GNU General Public License along with
 # simple-transforms. If not, see <https://www.gnu.org/licenses/>.
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'

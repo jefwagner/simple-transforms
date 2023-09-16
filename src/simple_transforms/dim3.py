@@ -96,7 +96,7 @@ def scale(s: Union[NumLike, npt.ArrayLike],
     s = np.array(s, dtype=dtype)
     # Scalar input
     if s.shape == ():
-        s = np.array([s,s,s], dtype=flint)
+        s = np.array([s,s,s], dtype=dtype)
     if s.shape != (3,):
         raise ValueError('The scale argument `s` must be a scalar or a 3 length [sx, sy, sz]')
     trans = eye(dtype=dtype)
@@ -301,7 +301,8 @@ def apply(transform: npt.NDArray, v_in: npt.ArrayLike) -> npt.NDArray:
         raise TypeError('foo')
     if v_in.shape[-1] not in [3,4]:
         raise ValueError('foo')
-    v_out = np.empty(v_in.shape, dtype=flint)
+    out_dtype = flint if transform.dtype == flint or v_in.dtype == flint else np.float64
+    v_out = np.empty(v_in.shape, dtype=out_dtype)
     if v_in.shape[-1] == 3:
         # apply for 3-length vertices
         apply_vert3(transform, v_in, v_out)
