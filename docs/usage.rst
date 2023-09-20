@@ -24,18 +24,19 @@ that package along with this as an optional dependency.
 Usage
 -----
 
-The package is imported as usual.
+The package contains two submodules for working with 2D (3x3) and 3D (4x4)
+transformation matrices
 
 .. code-block:: python
 
-    import simple_transforms as transforms
+    from simple-transforms import dim2, dim3
 
 You can create transformation matrices using any of the matrix creation
 routines. The result is a 4x4 NumPy array.
 
 .. code-block:: python
 
-    a = transforms.rot('z', np.pi/2)
+    a = dim3.rot('z', np.pi/2)
     print(a)
 
 The ``apply`` function can be used to apply a transform at any array-like set
