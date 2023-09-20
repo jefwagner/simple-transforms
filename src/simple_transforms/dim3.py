@@ -21,13 +21,16 @@ import numpy as np
 import numpy.typing as npt
 try:
     from flint import flint
-    DEFAULT_DTYPE = flint
+    has_flint = True
+    NumLike = Union[int, float, flint]
 except ModuleNotFoundError:
-    DEFAULT_DTYPE = np.float64
+    has_flint = False
+    NumLike = Union[int, float]
+
+DEFAULT_DTYPE = np.float64
 
 from ._c_trans import rescale3, apply_vert3
 
-NumLike = Union[int, float, flint]
 
 def eye(dtype: npt.DTypeLike = DEFAULT_DTYPE) -> npt.NDArray:
     """Create an identify affine transform"""
@@ -298,10 +301,15 @@ def apply(transform: npt.NDArray, v_in: npt.ArrayLike) -> npt.NDArray:
     if not isinstance(v_in, np.ndarray):
         v_in = np.array(v_in)
     if len(v_in.shape) == 0:
-        raise TypeError('foo')
+        raise TypeError('Point(s) must be 3D points or 4D homogenous coordinates')
     if v_in.shape[-1] not in [3,4]:
-        raise ValueError('foo')
-    out_dtype = flint if transform.dtype == flint or v_in.dtype == flint else np.float64
+        raise ValueError('Point(s) must be 3D points or 4D homogenous coordinates')
+    if has_flint and (transform.dtype == flint or v_in.dtype == flint):
+        out_dtype = flint
+    elif transform.dtype == np.float64 or v_in.dtype == np.float64:
+        out_dtype = np.float64
+    else:
+        out_dtype = np.float32
     v_out = np.empty(v_in.shape, dtype=out_dtype)
     if v_in.shape[-1] == 3:
         # apply for 3-length vertices

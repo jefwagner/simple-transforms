@@ -21,9 +21,13 @@ import numpy as np
 import numpy.typing as npt
 try:
     from flint import flint
-    DEFAULT_DTYPE = flint
+    has_flint = True
+    NumLike = Union[int, float, flint]
 except ModuleNotFoundError:
-    DEFAULT_DTYPE = np.float64
+    has_flint = False
+    NumLike = Union[int, float]
+
+DEFAULT_DTYPE = np.float64
 
 from ._c_trans import rescale2, apply_vert2
 
@@ -264,7 +268,12 @@ def apply(transform: npt.NDArray, v_in: npt.ArrayLike) -> npt.NDArray:
         raise TypeError('foo')
     if v_in.shape[-1] not in [2,3]:
         raise ValueError('foo')
-    out_dtype = flint if transform.dtype == flint or v_in.dtype == flint else np.float64
+    if has_flint and (transform.dtype == flint or v_in.dtype == flint):
+        out_dtype = flint
+    elif transform.dtype == np.float64 or v_in.dtype == np.float64:
+        out_dtype = np.float64
+    else:
+        out_dtype = np.float32
     v_out = np.empty(v_in.shape, dtype=out_dtype)
     if v_in.shape[-1] == 2:
         # apply for 2-length vertices
